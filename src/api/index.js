@@ -6,6 +6,7 @@
 技能: 根据接口文档定义接口请求函数
  */
 import ajax from './ajax'
+import jsonp from 'jsonp'
 
 // 登陆
 export const reqLogin = (username, password) => ajax('/login', {username, password}, 'POST')
@@ -13,3 +14,26 @@ export const reqLogin = (username, password) => ajax('/login', {username, passwo
 // 添加用户
 export const reqAddUser = (user) => ajax('/manage/user/add', user, 'POST')
 
+//请求获取天气
+export function reqWeather(city){
+  return new Promise(function (resolve, reject) {
+    const url =`http://api.map.baidu.com/telematics/v3/weather?location=${city}&output=json&ak=3p49MVra6urFRGOT9s8UBWr2`
+    //发送异步ajax请求
+    jsonp(
+      url,
+      {
+        param:'callback'
+      },
+      (error,data) =>{
+        console.log('callback', error, data);
+        if (!error) {
+          const {dayPictureUrl, weather} = data.results[0].weather_data[0]
+          resolve({dayPictureUrl, weather})
+        } else {
+          alert('获取天气信息失败')
+        }
+
+      }
+      )
+  })
+}
